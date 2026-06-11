@@ -22,6 +22,8 @@ body {
   flex-direction: column;
   align-items: center;
   overflow: hidden;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 header {
@@ -161,6 +163,9 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .key.wide { max-width: 70px; flex: 1.6; font-size: 0.7rem; }

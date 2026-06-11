@@ -203,12 +203,30 @@
         btn.className = "key" + (k.length > 1 ? " wide" : "");
         btn.textContent = k === "back" ? "⌫" : k;
         btn.dataset.key = k;
-        btn.addEventListener("click", () => handleKey(k));
+        // pointerdown (not click) so taps register instantly and never count
+        // toward the browser's double-tap zoom gesture
+        if (window.PointerEvent) {
+          btn.addEventListener("pointerdown", (e) => {
+            e.preventDefault();
+            handleKey(k);
+          });
+        } else {
+          btn.addEventListener("click", () => handleKey(k));
+        }
         row.appendChild(btn);
         if (k.length === 1) keyEls[k] = btn;
       });
       kb.appendChild(row);
     });
+    // Block double-tap zoom on the keyboard for browsers that ignore
+    // touch-action: manipulation (older iOS Safari). Keys act on
+    // pointerdown, so suppressing the synthetic click loses nothing.
+    let lastTouch = 0;
+    kb.addEventListener("touchend", (e) => {
+      const now = Date.now();
+      if (now - lastTouch <= 350) e.preventDefault();
+      lastTouch = now;
+    }, { passive: false });
   }
 
   function colorKeys(guess, results) {
