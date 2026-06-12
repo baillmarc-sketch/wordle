@@ -4,6 +4,13 @@
   const ROWS = 6;
   const COLS = 5;
 
+  // Per-page configuration (set before this script loads to make a themed
+  // variant; defaults preserve the original game)
+  const TITLE = typeof GAME_TITLE !== "undefined" ? GAME_TITLE : "My Wordle";
+  const PREFIX = typeof GAME_PREFIX !== "undefined" ? GAME_PREFIX : "myWordle";
+  const ANSWER_POOL = typeof CUSTOM_ANSWERS !== "undefined" ? CUSTOM_ANSWERS : ANSWER_WORDS;
+  ANSWER_POOL.forEach((w) => VALID_WORDS.add(w));
+
   // ---------- Answer selection ----------
 
   function todayKey() {
@@ -16,7 +23,7 @@
     return typeof w === "string" && /^[a-z]{5}$/.test(w.toLowerCase().trim());
   }
 
-  // Deterministic per-day pick from ANSWER_WORDS (mulberry32 seeded by day number)
+  // Deterministic per-day pick from the answer pool (mulberry32 seeded by day number)
   function dailyDatabaseWord(dateKey) {
     const [y, m, d] = dateKey.split("-").map(Number);
     const dayNum = Math.floor(Date.UTC(y, m - 1, d) / 86400000);
@@ -24,7 +31,7 @@
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     const r = ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    return ANSWER_WORDS[Math.floor(r * ANSWER_WORDS.length)];
+    return ANSWER_POOL[Math.floor(r * ANSWER_POOL.length)];
   }
 
   // A shared challenge link (?w=BASE64WORD) takes priority, then the
@@ -49,8 +56,8 @@
 
   // ---------- State ----------
 
-  const STATE_KEY = "myWordle.state";
-  const STATS_KEY = "myWordle.stats";
+  const STATE_KEY = PREFIX + ".state";
+  const STATS_KEY = PREFIX + ".stats";
 
   let guesses = [];          // submitted guesses (strings)
   let current = "";          // letters typed in the active row
@@ -347,8 +354,8 @@
 
   function shareText() {
     const header = MODE === "challenge"
-      ? `My Wordle (challenge) ${status === "won" ? guesses.length : "X"}/6`
-      : `My Wordle ${GAME_ID} ${status === "won" ? guesses.length : "X"}/6`;
+      ? `${TITLE} (challenge) ${status === "won" ? guesses.length : "X"}/6`
+      : `${TITLE} ${GAME_ID} ${status === "won" ? guesses.length : "X"}/6`;
     const grid = guesses
       .map((g) => evaluate(g).map((r) => (r === "correct" ? "🟩" : r === "present" ? "🟨" : "⬛")).join(""))
       .join("\n");

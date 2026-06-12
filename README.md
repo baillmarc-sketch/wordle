@@ -19,6 +19,10 @@ const DAILY_OVERRIDES = {
 - Words must be exactly 5 letters. Your word doesn't have to be in the dictionary — it will still be accepted as a guess.
 - Any date without an entry gets a deterministic word from the answer database, so everyone playing on the same day sees the same word.
 
+## Turdle (the potty-mouth edition)
+
+A second game lives at [`potty/index.html`](potty/index.html): same rules, but every daily answer is a swear word or toilet humor. It has its own answer pool (`potty/words.js` — edit freely), its own word-of-the-day file (`potty/daily-words.js`), and separate saved progress and stats, so playing one game never touches the other. Normal dictionary words are still accepted as guesses.
+
 ## Custom challenge links
 
 You can also share a one-off puzzle without touching the daily word. Encode any 5-letter word in base64 and pass it as the `w` query parameter:
